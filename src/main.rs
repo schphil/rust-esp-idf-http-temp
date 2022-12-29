@@ -1,8 +1,6 @@
-use std::sync::Arc;
-use std::sync::Mutex;
-use std::sync::Condvar;
+use std::sync::{Arc, Condvar, Mutex};
 
-use esp_idf_hal::{delay::Ets, peripherals::Peripherals};
+use esp_idf_hal::peripherals::Peripherals;
 use esp_idf_svc::eventloop::*;
 use esp_idf_sys as _;
 use log::*;
@@ -42,11 +40,7 @@ fn main() -> Result<(), Error> {
         if let Some(cycles) = *wait {
             break cycles;
         } else {
-            wait = mutex
-                .1
-                .wait_timeout(wait, std::time::Duration::from_secs(1))
-                .unwrap()
-                .0;
+            wait = mutex.1.wait_timeout(wait, std::time::Duration::from_secs(1)).unwrap().0;
 
             log::info!(
                 "Temperature sensor reading: {}mV",

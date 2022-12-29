@@ -1,12 +1,8 @@
-use std::{
-    sync::{ Arc, Condvar, Mutex},
-};
+use std::sync::{Arc, Condvar, Mutex};
 
 #[allow(deprecated)]
 use embedded_svc::httpd::{registry::*, *};
-use esp_idf_svc::{
-    httpd as idf,
-};
+use esp_idf_svc::httpd as idf;
 
 #[allow(unused_variables)]
 #[cfg(not(feature = "experimental"))]

@@ -17,7 +17,7 @@ pub fn wifi(
 ) -> Result<Box<EspWifi<'static>>, Error> {
     use std::net::Ipv4Addr;
 
-    use esp_idf_svc::handle::RawHandle;
+    // use esp_idf_svc::handle::RawHandle;
 
     let mut wifi = Box::new(EspWifi::new(modem, sysloop.clone(), None)?);
 
