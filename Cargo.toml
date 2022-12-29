@@ -1,0 +1,32 @@
+[package]
+name = "esp32-http-temp"
+version = "0.1.0"
+authors = ["Philipp Scheff <philippscheff@me.com>"]
+edition = "2021"
+resolver = "2"
+
+[profile.release]
+opt-level = "s"
+
+[profile.dev]
+debug = true # Symbols are nice and they don't increase the size on Flash
+opt-level = "z"
+
+[features]
+pio = ["esp-idf-sys/pio"]
+
+[dependencies]
+anyhow = "1.0"
+dotenv = "0.15"
+embedded-svc = "0.24.0"
+esp-idf-hal = "0.40.1"
+esp-idf-svc = "0.45.0"
+esp-idf-sys = { version = "0.32.1", features = ["binstart"] }
+libm = "0.2.5"
+log = "0.4.17"
+thiserror = "1.0"
+
+[build-dependencies]
+anyhow = "1.0"
+embuild = "0.30.4"
+thiserror = "1.0"
