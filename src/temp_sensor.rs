@@ -31,8 +31,5 @@ pub fn read_temp_send(
     let t_k = 1.0 / (A + (B * log(r)) + (C * log(r) * log(r) * log(r)));
     let t_c = t_k - 273.15;
 
-    info!("Analog value: {}", adc);
-    info!("Temperature: {}", t_c);
-
     Ok(t_c)
 }
