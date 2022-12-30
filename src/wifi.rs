@@ -21,8 +21,11 @@ pub fn wifi(
 
     let mut wifi = Box::new(EspWifi::new(modem, sysloop.clone(), None)?);
 
-    let ssid = dotenv::var("RUST_ESP32_STD_DEMO_WIFI_SSID").expect("RUST_ESP32_STD_DEMO_WIFI_SSID muste be set");
-    let pass = dotenv::var("RUST_ESP32_STD_DEMO_WIFI_PASS").expect("RUST_ESP32_STD_DEMO_WIFI_PASS muste be set");
+    // let ssid = dotenv::var("RUST_ESP32_STD_DEMO_WIFI_SSID").expect("RUST_ESP32_STD_DEMO_WIFI_SSID muste be set");
+    // let pass = dotenv::var("RUST_ESP32_STD_DEMO_WIFI_PASS").expect("RUST_ESP32_STD_DEMO_WIFI_PASS muste be set");
+
+    let ssid = "fls-47246".to_string();
+    let pass = "nvHD-UNZr-8BzW-VFQV".to_string();
 
     info!("Wifi created, about to scan");
 

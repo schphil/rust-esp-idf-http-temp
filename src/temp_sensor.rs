@@ -1,8 +1,9 @@
+use std::sync::{Arc, Mutex};
+
 use esp_idf_hal::{
     adc,
-    adc::{config::Config, AdcChannelDriver, AdcDriver, Atten11dB},
+    adc::{AdcChannelDriver, AdcDriver, Atten11dB},
     gpio::Gpio0,
-    peripherals::Peripherals,
 };
 use libm::log;
 use log::*;
@@ -17,24 +18,13 @@ static A: f64 = 0.001129148;
 static B: f64 = 0.000234125;
 static C: f64 = 0.0000000876741;
 
-pub fn setup_adc() -> Result<AdcDriver<'static, adc::ADC1>, Error> {
-    let peripherals = Peripherals::take().unwrap();
-    let adc1 = peripherals.adc1;
-    Ok(adc::AdcDriver::new(adc1, &Config::new().calibration(true))?)
-}
-
-pub fn setup_adc_pin() -> Result<AdcChannelDriver<'static, Gpio0, Atten11dB<adc::ADC1>>, Error> {
-    let peripherals = Peripherals::take().unwrap();
-    let analog_pin = peripherals.pins.gpio0;
-    let adc_pin: esp_idf_hal::adc::AdcChannelDriver<'_, Gpio0, Atten11dB<_>> = adc::AdcChannelDriver::new(analog_pin)?;
-    Ok(adc_pin)
-}
-
 pub fn read_temp_send(
-    adc: &mut AdcDriver<'static, adc::ADC1>,
-    adc_pin: &mut AdcChannelDriver<'static, Gpio0, Atten11dB<adc::ADC1>>,
+    adc_mutex: Arc<Mutex<AdcDriver<'static, adc::ADC1>>>,
+    adc_pin_mutex: Arc<Mutex<AdcChannelDriver<'static, Gpio0, Atten11dB<adc::ADC1>>>>,
 ) -> Result<f64, Error> {
-    let adc = adc.read(adc_pin)?;
+    let mut adc = adc_mutex.lock().unwrap();
+    let mut adc_pin = adc_pin_mutex.lock().unwrap();
+    let adc = adc.read(&mut adc_pin)?;
     let v_out = adc as f64 * VCC / ADCMAX;
     let r = v_out * R2 / (VCC - v_out);
 

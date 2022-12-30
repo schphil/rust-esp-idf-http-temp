@@ -1,6 +1,11 @@
 use std::sync::{Arc, Condvar, Mutex};
 
-use esp_idf_hal::peripherals::Peripherals;
+use esp_idf_hal::{
+    adc,
+    adc::{config::Config, Atten11dB},
+    gpio::Gpio0,
+    peripherals::Peripherals,
+};
 use esp_idf_svc::eventloop::*;
 use esp_idf_sys as _;
 use log::*;
@@ -16,7 +21,13 @@ fn main() -> Result<(), Error> {
     esp_idf_sys::link_patches();
 
     #[allow(unused)]
-    let peripherals = Peripherals::take().unwrap();
+    let mut peripherals = Peripherals::take().unwrap();
+    let adc1 = peripherals.adc1;
+    let adc = adc::AdcDriver::new(adc1, &Config::new().calibration(true))?;
+    let analog_pin = peripherals.pins.gpio0;
+    let adc_pin: esp_idf_hal::adc::AdcChannelDriver<'_, Gpio0, Atten11dB<_>> = adc::AdcChannelDriver::new(analog_pin)?;
+    let adc_mutex = Arc::new(Mutex::new(adc));
+    let adc_pin_mutex = Arc::new(Mutex::new(adc_pin));
 
     #[allow(unused)]
     let sysloop = EspSystemEventLoop::take()?;
@@ -28,24 +39,16 @@ fn main() -> Result<(), Error> {
 
     let mutex = Arc::new((Mutex::new(None), Condvar::new()));
 
-    let httpd = http::httpd(mutex.clone())?;
+    let httpd = http::httpd(mutex.clone(), adc_mutex, adc_pin_mutex)?;
 
     let mut wait = mutex.0.lock().unwrap();
 
-    let mut adc = temp_sensor::setup_adc()?;
-    let mut adc_pin = temp_sensor::setup_adc_pin()?;
-
     #[allow(unused)]
-    let cycles = loop {
+    let cycles: _ = loop {
         if let Some(cycles) = *wait {
             break cycles;
         } else {
             wait = mutex.1.wait_timeout(wait, std::time::Duration::from_secs(1)).unwrap().0;
-
-            log::info!(
-                "Temperature sensor reading: {}mV",
-                temp_sensor::read_temp_send(&mut adc, &mut adc_pin)?
-            );
         }
     };
 
