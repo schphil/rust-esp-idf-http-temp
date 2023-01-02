@@ -1,5 +1,5 @@
 [package]
-name = "esp32-http-temp"
+name = "rust-esp-idf-http-temp"
 version = "0.1.0"
 authors = ["Philipp Scheff <philippscheff@me.com>"]
 edition = "2021"
